@@ -1,7 +1,10 @@
-from email.policy import default
-
+from http.client import HTTPException
+from typing import Optional
+from pydantic import BaseModel
 from fastapi import FastAPI, Query, Body
 import uvicorn
+
+
 app = FastAPI()
 
 
@@ -54,6 +57,45 @@ def create_hotel(
     }
 
 # все параметры
+@app.put('/hotels/{hotel_id}')
+def update_hotel(
+        hotel_id: int,
+        title: str = Body(),
+        name: str = Body()
+
+):
+    global hotels
+    for index in range(len(hotels)):
+        if hotels[index]['id'] == hotel_id:
+            hotels[index]['title'] = title
+            hotels[index]['name'] = name
+    return {
+        'status': 'OK'
+    }
+
+
+class InfoHotel(BaseModel):
+    title: Optional[str] = None  # Это поле необязательное
+    name: Optional[str] = None
+
+
+@app.patch('/hotels/{hotel_id}')
+def update_hotel(
+        hotel_id: int,
+        hotel_info: InfoHotel
+):
+    global hotels
+    for index in range(len(hotels)):
+        if hotels[index]['id'] == hotel_id:
+            if hotel_info.title:
+                hotels[index]['title'] = hotel_info.title
+            if hotel_info.name:
+                hotels[index]['name'] = hotel_info.name
+            return {
+                'status': 'OK'
+            }
+
+
 
 
 
